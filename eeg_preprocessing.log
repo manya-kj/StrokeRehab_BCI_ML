@@ -1,0 +1,7 @@
+2025-03-27 11:08:37,944 - INFO: Successfully loaded dataset: C:\Users\Manya K J\OneDrive\Desktop\ML_MiniProject\EEG_Motor_Imagery\BCICIV_2a_all_patients.csv
+2025-03-27 11:08:39,911 - ERROR: Noise removal error: could not convert string to float: 'tongue'
+2025-03-27 11:08:39,911 - ERROR: Preprocessing pipeline error: could not convert string to float: 'tongue'
+2025-03-27 11:09:52,203 - INFO: Noise removal completed successfully
+2025-03-27 11:09:52,647 - INFO: Signal normalization completed
+2025-03-27 11:09:52,810 - INFO: Epoching completed. Total epochs: 3935
+2025-03-27 11:09:54,389 - INFO: Preprocessing visualization saved
