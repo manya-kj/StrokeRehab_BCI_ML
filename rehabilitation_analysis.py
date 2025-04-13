@@ -99,6 +99,15 @@ def extract_rehabilitation_features(epochs, use_parallel=False, n_jobs=1):
     
     return features_df, np.array(patient_ids), np.array(labels)
 
+    unique_patient_ids = np.unique(patient_ids)
+    id_mapping = {old_id: i+1 for i, old_id in enumerate(sorted(unique_patient_ids))}
+    
+    # Map the IDs to integers
+    patient_ids = np.array([id_mapping[pid] for pid in patient_ids])
+    features_df['patient_id'] = features_df['patient_id'].map(id_mapping)
+    
+    return features_df, np.array(patient_ids), np.array(labels)
+
 def analyze_motor_imagery_patterns(features_df, labels):
     """
     Analyze patterns in motor imagery by comparing features across different tasks.

@@ -36,6 +36,21 @@ def generate_consolidated_report(patient_recommendations, effectiveness_predicti
         on='patient_id'
     )
     
+    def fix_patient_id(patient_id):
+        # Check if it's in scientific notation (negative exponent)
+        if isinstance(patient_id, float) and 'E-' in str(patient_id).upper():
+            # Extract numeric value from ID string
+            # Map range of values to integers 1-9
+            # Simple approach: sort all unique values and assign sequential IDs
+            unique_ids = sorted(report_data['patient_id'].unique())
+            id_mapping = {old_id: i+1 for i, old_id in enumerate(unique_ids)}
+            return id_mapping[patient_id]
+        return patient_id
+    
+    report_data['original_patient_id'] = report_data['patient_id']
+    report_data['patient_id'] = report_data['patient_id'].astype(int)
+
+
     # Total patients count
     total_patients = len(report_data)
     print(f"Processing data for {total_patients} patients...")
