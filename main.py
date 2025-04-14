@@ -1,29 +1,3 @@
-# from preprocessing2 import EEGPreprocessing  # Import the EEGPreprocessing class directly
-# from rehabilitation_analysis import run_rehabilitation_analysis
-
-# def main():
-#     # Step 1: Initialize and run the EEG preprocessing pipeline
-#     print("Starting preprocessing of EEG data...")
-#     dataset_path = 'BCICIV_2a_all_patients.csv'
-#     preprocessor = EEGPreprocessing(dataset_path)
-    
-#     # Run preprocessing pipeline to get epochs
-#     epochs = preprocessor.run_preprocessing_pipeline(
-#         epoch_duration=1.0,  # 1-second epochs
-#         overlap=0.5          # 50% overlap between epochs
-#     )
-    
-#     # Step 2: Run the rehabilitation analysis pipeline
-#     print("Starting rehabilitation analysis...")
-#     results = run_rehabilitation_analysis(epochs)
-    
-#     print("Project execution complete.")
-#     print("Check 'patient_reports' directory for detailed rehabilitation recommendations.")
-
-# if __name__ == "__main__":
-#     main()
-
-#test change
 from preprocessing2 import EEGPreprocessing
 import rehabilitation_analysis as rehab
 import multiprocessing as mp
@@ -32,67 +6,49 @@ import numpy as np
 from consolidated_reports import generate_consolidated_report
 
 def main():
-    # Set environment variables to control thread usage
-    os.environ['OMP_NUM_THREADS'] = '4'  # Control OpenMP threads
-    os.environ['MKL_NUM_THREADS'] = '4'  # Control Intel MKL threads
-    np.set_printoptions(precision=3)     # Reduce numpy printing precision (saves memory)
-    
-    # Optional: Disable unnecessary matplotlib features
-    import matplotlib
-    matplotlib.use('Agg')  # Use non-interactive backend
-    
-    # Step 1: Initialize and run the EEG preprocessing pipeline
-    print("Starting preprocessing of EEG data...")
     dataset_path = 'BCICIV_2a_all_patients.csv'
-    preprocessor = EEGPreprocessing(dataset_path)
-    
-    # Run preprocessing pipeline to get epochs
-    epochs = preprocessor.run_preprocessing_pipeline(
-        epoch_duration=1.0,  # 1-second epochs
-        overlap=0.5          # 50% overlap between epochs
-    )
-    
-    # Optional: Process only a subset for quick testing
-    # epochs = epochs[:500]  # Comment this line for full processing
-    
-    # Step 2: Run the rehabilitation analysis pipeline with multiprocessing
-    print("Starting rehabilitation analysis...")
-    # Set multiprocessing usage
-    num_cpus = max(1, mp.cpu_count() - 1)  # Leave one CPU free for system
-    print(f"Using {num_cpus} CPU cores for processing")
-    
-    # Extract features, analyze patterns and estimate impairment
-    print("Extracting features and analyzing patterns...")
-    features_df, patient_ids, labels = rehab.extract_rehabilitation_features(
-        epochs, use_parallel=True, n_jobs=num_cpus
-    )
-    
-    task_means = rehab.analyze_motor_imagery_patterns(features_df, labels)
-    
-    # Estimate impairment levels
-    print("Estimating impairment levels...")
-    impairment_df = rehab.estimate_impairment_level(features_df, labels, patient_ids)
-    
-    # Build therapy recommendations
-    print("Building therapy recommendations...")
-    patient_recommendations = rehab.build_therapy_recommendation_model(
-        features_df, impairment_df
-    )
-    
-    # Predict therapy effectiveness
-    print("Predicting therapy effectiveness...")
-    effectiveness_predictions = rehab.predict_therapy_effectiveness(
-        features_df, patient_recommendations
-    )
-    
-    # Generate consolidated report
-    print("Generating consolidated report...")
-    report_path = generate_consolidated_report(
-        patient_recommendations, effectiveness_predictions, impairment_df
-    )
-    
-    print("Analysis complete!")
-    print(f"Consolidated report available at: {report_path}")
+    print("Starting preprocessing...")
+    try:
+        preprocessor = EEGPreprocessing(dataset_path)  # Pass filename here
+        train_epochs, val_epochs, test_epochs = preprocessor.run_preprocessing_pipeline(epoch_duration=1.0, overlap=0.5)
+        print(f"Preprocessing complete. Train: {len(train_epochs)}, Validation: {len(val_epochs)}, Test: {len(test_epochs)} epochs.")
+
+        # CPU config
+        num_cpus = max(1, mp.cpu_count() - 1)
+
+        # ----- TRAIN -----
+        print("Processing TRAIN set...")
+        train_features, train_pids, train_labels = rehab.extract_rehabilitation_features(train_epochs, use_parallel=True, n_jobs=num_cpus)
+        train_impairments = rehab.estimate_impairment_level(train_features, train_labels, train_pids)
+        train_recommendations = rehab.build_therapy_recommendation_model(train_features, train_impairments)
+        train_effectiveness = rehab.predict_therapy_effectiveness(train_features, train_recommendations)
+
+        # ----- VALIDATION (Optional for tuning) -----
+        print("Processing VALIDATION set...")
+        val_features, val_pids, val_labels = rehab.extract_rehabilitation_features(val_epochs, use_parallel=True, n_jobs=num_cpus)
+        val_impairments = rehab.estimate_impairment_level(val_features, val_labels, val_pids)
+        val_recommendations = rehab.build_therapy_recommendation_model(val_features, val_impairments)
+        val_effectiveness = rehab.predict_therapy_effectiveness(val_features, val_recommendations)
+
+        # ----- TEST -----
+        print("Processing TEST set...")
+        test_features, test_pids, test_labels = rehab.extract_rehabilitation_features(test_epochs, use_parallel=True, n_jobs=num_cpus)
+        test_impairments = rehab.estimate_impairment_level(test_features, test_labels, test_pids)
+        test_recommendations = rehab.build_therapy_recommendation_model(test_features, test_impairments)
+        test_effectiveness = rehab.predict_therapy_effectiveness(test_features, test_recommendations)
+
+        # Only generate final reports for TEST set (best practice)
+        print("Generating consolidated report from TEST set...")
+        report_path = generate_consolidated_report(
+            test_recommendations, test_effectiveness, test_impairments
+        )
+
+        print("Done! Report available at:", report_path)
+
+    except Exception as e:
+        print(f"Preprocessing failed: {e}")
+        import traceback
+        traceback.print_exc()
 
 if __name__ == "__main__":
     main()

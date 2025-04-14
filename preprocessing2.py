@@ -2,6 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 import scipy.signal
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 import logging
@@ -22,6 +23,7 @@ class EEGPreprocessing:
         self.preprocessed_data = None
         self.epochs = None
 
+    # Make sure load_data is defined as part of the class
     def load_data(self):
         try:
             self.raw_data = pd.read_csv(self.dataset_path)
@@ -132,31 +134,28 @@ class EEGPreprocessing:
 
     def run_preprocessing_pipeline(self, epoch_duration=1.0, overlap=0.5):
         try:
-            data = self.load_data()
+            data = self.load_data()  # Make sure this method is being called
             cleaned = self.filter_data(data)
             normalized = self.normalize_data(cleaned)
-            self.epochs = self.segment_into_epochs(normalized, epoch_duration, overlap)
-            self.visualize_preprocessing(data, normalized, self.epochs)
+            epochs = self.segment_into_epochs(normalized, epoch_duration, overlap)
+            self.visualize_preprocessing(data, normalized, epochs)
+            
+            # Split by patient-wise epochs
+            epoch_labels = [epoch['label'].iloc[0] for epoch in epochs]
+            patient_ids = [epoch['patient'].iloc[0] for epoch in epochs]
 
-            logging.info("Preprocessing pipeline completed successfully")
-            return self.epochs
+            # Initial train-test split (80/20)
+            train_val_epochs, test_epochs = train_test_split(
+                epochs, test_size=0.2, random_state=42, stratify=patient_ids
+            )
+
+            # From train_val split, extract validation set (20% of train_val → 16% of total)
+            train_epochs, val_epochs = train_test_split(
+                train_val_epochs, test_size=0.2, random_state=42, stratify=[e['patient'].iloc[0] for e in train_val_epochs]
+            )
+
+            return train_epochs, val_epochs, test_epochs
+
         except Exception as e:
             logging.error(f"Preprocessing pipeline failed: {e}")
             raise e
-
-
-def main():
-    dataset_path = 'BCICIV_2a_all_patients.csv'
-    try:
-        preprocessor = EEGPreprocessing(dataset_path)
-        epochs = preprocessor.run_preprocessing_pipeline(epoch_duration=1.0, overlap=0.5)
-        print(f"Preprocessing complete. Total epochs: {len(epochs)}")
-    except Exception as e:
-        print(f"Preprocessing failed: {e}")
-        import traceback
-        traceback.print_exc()
-
-if __name__ == "__main__":
-    main()
-
-#test message

@@ -548,4 +548,3 @@ if __name__ == "__main__":
     print("This module contains functions for EEG-based rehabilitation analysis.")
     print("Import and use these functions in your main script.")
 
-

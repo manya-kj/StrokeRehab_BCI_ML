@@ -22,3 +22,18 @@
 2025-04-13 22:45:44,634 - INFO: Preprocessing pipeline completed successfully
 2025-04-13 22:46:29,795 - INFO: Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
 2025-04-13 22:46:29,796 - INFO: Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-04-14 12:29:45,889 - ERROR: Failed to load data: [Errno 2] No such file or directory: 'BCICIV_2a_all_patients.csv'
+2025-04-14 12:29:45,889 - ERROR: Preprocessing pipeline failed: [Errno 2] No such file or directory: 'BCICIV_2a_all_patients.csv'
+2025-04-14 12:34:08,369 - ERROR: Failed to load data: [Errno 2] No such file or directory: 'BCICIV_2a_all_patients.csv'
+2025-04-14 12:34:08,369 - ERROR: Preprocessing pipeline failed: [Errno 2] No such file or directory: 'BCICIV_2a_all_patients.csv'
+2025-04-14 12:38:56,841 - INFO: EEG data loaded successfully
+2025-04-14 12:38:57,192 - INFO: Band-pass filtering applied
+2025-04-14 12:38:57,807 - INFO: Data normalization completed successfully
+2025-04-14 12:38:58,070 - INFO: Segmented into 3935 epochs
+2025-04-14 12:39:02,601 - INFO: Preprocessing visualization saved
+2025-04-14 12:39:31,144 - INFO: Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-04-14 12:39:31,147 - INFO: Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-04-14 12:39:38,322 - INFO: Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-04-14 12:39:38,322 - INFO: Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-04-14 12:39:49,547 - INFO: Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-04-14 12:39:49,549 - INFO: Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
